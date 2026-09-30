@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO & Metadata -->
+    <title>ClimaConsenso | Previsão Meteorológica Multimodelo & Ensemble</title>
+    <meta name="description" content="Aplicação meteorológica com motor de consenso multimodelo (IPMA, ECMWF, GFS, ICON, Météo-France), índice de certeza estatística e calibração por sensores em tempo real." />
+    <meta name="keywords" content="metereologia, previsao do tempo, ipma, ecmwf, gfs, icon, consenso, ensemble weather, portugal" />
+    <meta name="theme-color" content="#090d16" />
+
+    <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  </head>
+  <body class="theme-celestial">
+    <div id="app" class="app-root">
+      <!-- Container do Cabeçalho e Pesquisa -->
+      <div id="header-mount"></div>
+
+      <!-- Área de Notificações / Alertas Meteorológicos -->
+      <div id="alerts-mount"></div>
+
+      <!-- Conteúdo Principal -->
+      <main class="main-content" id="main-content">
+        <!-- Hero: Consenso Consolidado & Índice de Certeza -->
+        <div id="hero-mount"></div>
+
+        <!-- Matriz Comparativa dos Modelos Numéricos -->
+        <div id="comparison-mount"></div>
+
+        <!-- Validação Ground Truth com Estações do IPMA -->
+        <div id="groundtruth-mount"></div>
+
+        <!-- Gráfico Interativo de Dispersão e Ensemble -->
+        <div id="chart-mount"></div>
+
+        <!-- Previsão Horária Consolidada (24-36 Horas) -->
+        <div id="hourly-mount"></div>
+
+        <!-- Previsão para 7 Dias Consolidada com IPMA -->
+        <div id="daily-mount"></div>
+
+        <!-- Radar Meteorológico ao Vivo e Estações -->
+        <div id="radar-mount"></div>
+      </main>
+
+      <!-- Rodapé Informativo -->
+      <footer class="app-footer">
+        <div class="footer-inner">
+          <div class="footer-brand">
+            <strong>ClimaConsenso</strong>
+            <span>Fusão meteorológica de alta precisão baseada em ensemble multi-fonte</span>
+          </div>
+          <div class="footer-sources">
+            <span>Fontes integradas: IPMA • ECMWF • DWD ICON • NOAA GFS • Météo-France • RainViewer</span>
+          </div>
+        </div>
+      </footer>
+
+      <!-- Modal Mount -->
+      <div id="modal-mount"></div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
