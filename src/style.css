@@ -1275,6 +1275,8 @@ body::before {
   flex-direction: column;
   align-items: center;
   gap: 0.65rem;
+  cursor: pointer;
+  user-select: none;
   transition: all var(--transition-fast);
 }
 
@@ -1286,6 +1288,13 @@ body::before {
 .hourly-item.item-now {
   background: rgba(6, 182, 212, 0.12);
   border-color: rgba(6, 182, 212, 0.4);
+}
+
+.hourly-item.item-selected {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: rgba(56, 189, 248, 0.7);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+  transform: translateY(-3px);
 }
 
 .hourly-time {

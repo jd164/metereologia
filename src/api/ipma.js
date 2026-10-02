@@ -133,23 +133,61 @@ export async function getIpmaHourlyForecast(globalIdLocal) {
     const res = await fetch(`https://api.ipma.pt/public-data/forecast/aggregate/${globalIdLocal}.json`);
     if (!res.ok) return [];
     const json = await res.json();
-    return json
-      .filter(item => item.idPeriodo === 1 && item.tMed !== undefined)
-      .map(item => {
-        // No IPMA, probabilidadePrecipita < 0 (código -99.0) significa 0% de probabilidade de chuva
-        const rawProb = parseFloat(item.probabilidadePrecipita);
-        const prob = (!isNaN(rawProb) && rawProb >= 0) ? Math.round(rawProb) : 0;
 
-        return {
-          time: item.dataPrev,
-          temperature: parseFloat(item.tMed),
-          humidity: item.hR ? parseFloat(item.hR) : null,
-          windSpeed: item.ffVento ? parseFloat(item.ffVento) : null,
-          windDirection: item.ddVento,
-          weatherCode: item.idTipoTempo,
-          precipitationProbability: prob
-        };
-      });
+    const hourlyItems = json.filter(item => item.idPeriodo === 1 && item.tMed !== undefined);
+    if (hourlyItems.length === 0) return [];
+
+    // No IPMA (modelo numérico AROME), a probabilidade de precipitação é calculada para
+    // intervalos tri-horários (a cada 3 horas: 00h, 03h, 06h, 09h, 12h, 15h, 18h, 21h).
+    // As horas intermédias chegam da API com probabilidadePrecipita = "-99.0" (código de ausência de cálculo horário isolado).
+    // No site e na aplicação do IPMA, esse valor tri-horário abrange as 3 horas do bloco (ex.: às 15h, cobre 14h, 15h e 16h).
+    const validProbs = [];
+    for (const item of hourlyItems) {
+      const rawProb = parseFloat(item.probabilidadePrecipita);
+      if (!isNaN(rawProb) && rawProb >= 0) {
+        const timeMs = new Date(item.dataPrev.endsWith('Z') ? item.dataPrev : item.dataPrev + 'Z').getTime();
+        validProbs.push({
+          timeMs,
+          prob: Math.round(rawProb)
+        });
+      }
+    }
+
+    return hourlyItems.map(item => {
+      const itemTimeMs = new Date(item.dataPrev.endsWith('Z') ? item.dataPrev : item.dataPrev + 'Z').getTime();
+      const rawProb = parseFloat(item.probabilidadePrecipita);
+      let prob = 0;
+
+      if (!isNaN(rawProb) && rawProb >= 0) {
+        prob = Math.round(rawProb);
+      } else if (validProbs.length > 0) {
+        // Encontrar o bloco tri-horário mais próximo (janela centrada de ±90 min: H-1, H, H+1)
+        let closest = null;
+        let minDiff = Infinity;
+        for (const vp of validProbs) {
+          const diff = Math.abs(itemTimeMs - vp.timeMs);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closest = vp;
+          }
+        }
+        if (closest && minDiff <= 95 * 60 * 1000) {
+          prob = closest.prob;
+        } else if (closest && minDiff <= 3 * 3600 * 1000) {
+          prob = closest.prob;
+        }
+      }
+
+      return {
+        time: item.dataPrev,
+        temperature: parseFloat(item.tMed),
+        humidity: item.hR ? parseFloat(item.hR) : null,
+        windSpeed: item.ffVento ? parseFloat(item.ffVento) : null,
+        windDirection: item.ddVento,
+        weatherCode: item.idTipoTempo,
+        precipitationProbability: prob
+      };
+    });
   } catch (err) {
     console.warn(`Erro ao carregar previsão horária agregada do IPMA para ${globalIdLocal}:`, err);
     return [];

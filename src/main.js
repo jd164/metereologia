@@ -51,6 +51,7 @@ const state = {
   ipmaDailyForecast: null,
   ipmaHourlyForecast: [],
   ipmaHourlyReadings: [],
+  selectedHourIndex: null,
   isLoading: false
 };
 
@@ -106,6 +107,7 @@ function renderAppHeader() {
  */
 async function loadWeatherData() {
   state.isLoading = true;
+  state.selectedHourIndex = null;
   showLoadingUI();
 
   try {
@@ -284,10 +286,20 @@ function renderAllComponents() {
     currentHourIndex
   });
 
-  // 5. Previsão Horária (a começar exatamente na hora atual "Agora")
+  // 5. Previsão Horária (com suporte a clique para inspecionar qualquer hora)
   renderHourlyForecast(dom.hourly, {
     hourlyConsensus: state.hourlyConsensus,
-    currentHourIndex
+    currentHourIndex,
+    selectedHourIndex: state.selectedHourIndex !== null ? state.selectedHourIndex : currentHourIndex,
+    onSelectHour: (index) => {
+      state.selectedHourIndex = index;
+      state.currentHourData = state.hourlyConsensus[index] || state.hourlyConsensus[0];
+      state.confidenceData = calculateHourConfidence(state.currentHourData);
+      if (state.groundTruthData?.station) {
+        state.groundTruthData = evaluateModelAccuracy(state.groundTruthData.station, state.currentHourData);
+      }
+      renderAllComponents();
+    }
   });
 
   // 6. Previsão Diária

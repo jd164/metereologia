@@ -57,7 +57,7 @@ export function renderModelComparison(container, { currentHour, weights, ipmaDai
           <p class="model-weather-desc">Extremos: ${ipmaDailyToday?.tMin || '--'}° ~ ${ipmaDailyToday?.tMax || '--'}°C</p>
 
           <div class="model-metrics-list">
-            <div class="model-metric-item">
+            <div class="model-metric-item" title="Probabilidade oficial do IPMA calculada para o bloco tri-horário correspondente (nas últimas 3 horas)">
               <span class="metric-name">Prob. Chuva</span>
               <span class="metric-val ${ipmaProb >= 40 ? 'val-rain' : ''}">${ipmaProb}%</span>
             </div>
